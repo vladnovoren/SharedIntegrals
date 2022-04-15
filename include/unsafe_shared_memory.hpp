@@ -1,5 +1,5 @@
-#ifndef SHARED_MEMORY_HPP
-#define SHARED_MEMORY_HPP
+#ifndef UNSAFE_SHARED_MEMORY_HPP
+#define UNSAFE_SHARED_MEMORY_HPP
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -9,13 +9,12 @@
 #include <string>
 
 #include "fd_helpers.hpp"
-#include "semaphore.hpp"
 
-class SharedMemory {
+class UnsafeSharedMemory {
  public:
-  SharedMemory(const char* name);
-  SharedMemory(const char* name, const size_t size);
-  ~SharedMemory();
+  explicit UnsafeSharedMemory(const char* name);
+  UnsafeSharedMemory(const char* name, const size_t size);
+  virtual ~UnsafeSharedMemory() = 0;
 
   const std::string& Name();
 
@@ -30,7 +29,7 @@ class SharedMemory {
 
   void* Map(const int fd, const size_t bytes_cnt);
 
- private:
+ protected:
   struct SharedFields {
     size_t size_;
   };
@@ -39,10 +38,8 @@ class SharedMemory {
   void* data_ = nullptr;
   SharedFields* shared_fields_ = nullptr;
 
-  std::string memory_name_;
-  std::string semaphore_name_;
+  std::string name_;
 
-  Semaphore semaphore_;
 };
 
-#endif /* shared_memory.hpp */
+#endif /* unsafe_shared_memory.hpp */

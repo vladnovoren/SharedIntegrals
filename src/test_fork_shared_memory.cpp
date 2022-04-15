@@ -1,7 +1,7 @@
 #include "shared_memory.hpp"
 
 void ChildRoutine() {
-  sleep(3);
+  // sleep(3);
   SharedMemory shared_memory("shared_memory");
   int* ptr = static_cast<int*>(shared_memory.Data());
   *ptr = 1;
@@ -22,7 +22,7 @@ int main() {
     break;
 
    case 0:
-    ChildRoutine();
+    // ChildRoutine();
     break;
 
    default:

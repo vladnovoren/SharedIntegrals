@@ -1,19 +1,26 @@
 #include "shared_memory.hpp"
 
-SharedMemory::SharedMemory(const char* name) : name_(name) {
+SharedMemory::SharedMemory(const char *name)
+    : memory_name_(name), semaphore_name_("/sem_" + memory_name_),
+      semaphore_(semaphore_name_.c_str()) {
   assert(name != nullptr);
+
+  semaphore_.Wait();
 
   int fd = ShmOpenCreated(name);
   buffer_ = Map(fd, FileSize(fd));
   CloseFD(fd);
 
   SetPointerFields();
+
+  semaphore_.Post();
 }
 
-SharedMemory::SharedMemory(const char* name, const size_t size) :
-  name_(name) {
+SharedMemory::SharedMemory(const char *name, const size_t size)
+    : memory_name_(name), semaphore_name_("/sem_" + memory_name_),
+      semaphore_(semaphore_name_.c_str(), 1) {
   assert(name != nullptr);
-  
+
   int fd = ShmCreate(name, size + sizeof(SharedFields));
   Truncate(fd, size + sizeof(SharedFields));
   buffer_ = Map(fd, size + sizeof(SharedFields));
@@ -21,14 +28,14 @@ SharedMemory::SharedMemory(const char* name, const size_t size) :
 
   SetPointerFields();
   shared_fields_->size_ = size;
+
+  semaphore_.Post();
 }
 
-SharedMemory::~SharedMemory() {
-  shm_unlink(name_.c_str());
-}
+SharedMemory::~SharedMemory() { shm_unlink(memory_name_.c_str()); }
 
-void* SharedMemory::Data(const size_t offset) {
-  return static_cast<uint8_t*>(data_) + offset;
+void *SharedMemory::Data(const size_t offset) {
+  return static_cast<uint8_t *>(data_) + offset;
 }
 
 size_t SharedMemory::Size() const {
@@ -38,37 +45,45 @@ size_t SharedMemory::Size() const {
 }
 
 void SharedMemory::SetPointerFields() {
-  shared_fields_ = static_cast<SharedFields*>(buffer_);
-  data_ = static_cast<uint8_t*>(buffer_) + sizeof(SharedFields);
+  shared_fields_ = static_cast<SharedFields *>(buffer_);
+  data_ = static_cast<uint8_t *>(buffer_) + sizeof(SharedFields);
 }
 
-int SharedMemory::ShmCreate(const char* name, const size_t bytes_cnt) {
+int SharedMemory::ShmCreate(const char *name, const size_t bytes_cnt) {
   assert(name != nullptr);
 
   int fd = shm_open(name, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
   if (fd == -1) {
-    throw std::runtime_error(strerror(errno));
+    std::string error_msg = __PRETTY_FUNCTION__;
+    error_msg += '\n';
+    error_msg += strerror(errno);
+    throw std::runtime_error(error_msg);
   }
 
   return fd;
 }
 
-int SharedMemory::ShmOpenCreated(const char* name) {
+int SharedMemory::ShmOpenCreated(const char *name) {
   assert(name != nullptr);
 
   int fd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
   if (fd == -1) {
-    printf("balda\n");
-    throw std::runtime_error(strerror(errno));
+    std::string error_msg = __PRETTY_FUNCTION__;
+    error_msg += '\n';
+    error_msg += strerror(errno);
+    throw std::runtime_error(error_msg);
   }
 
   return fd;
 }
 
-void* SharedMemory::Map(const int fd, const size_t bytes_cnt) {
-  void* addr = mmap(NULL, bytes_cnt, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+void *SharedMemory::Map(const int fd, const size_t bytes_cnt) {
+  void *addr = mmap(NULL, bytes_cnt, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
   if (addr == MAP_FAILED) {
-    throw std::runtime_error(strerror(errno));
+    std::string error_msg = __PRETTY_FUNCTION__;
+    error_msg += '\n';
+    error_msg += strerror(errno);
+    throw std::runtime_error(error_msg);
   }
   return addr;
 }
