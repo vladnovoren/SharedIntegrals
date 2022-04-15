@@ -19,8 +19,7 @@ class SharedMemory {
   const std::string& Name();
 
   void* Data(const size_t offset = 0);
-  size_t Cap() const;
-
+  size_t Size() const;
 
  private:
   void SetPointerFields();

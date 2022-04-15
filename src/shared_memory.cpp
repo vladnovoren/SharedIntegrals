@@ -31,7 +31,7 @@ void* SharedMemory::Data(const size_t offset) {
   return static_cast<uint8_t*>(data_) + offset;
 }
 
-size_t SharedMemory::Cap() const {
+size_t SharedMemory::Size() const {
   assert(shared_fields_ != nullptr);
 
   return shared_fields_->size_;
@@ -58,6 +58,7 @@ int SharedMemory::ShmOpenCreated(const char* name) {
 
   int fd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
   if (fd == -1) {
+    printf("balda\n");
     throw std::runtime_error(strerror(errno));
   }
 

@@ -6,9 +6,10 @@ project(SharedIntegrals)
 
 # add_executable(test src/test.cpp)
 
-add_library(linear_shm_allocator STATIC
-  src/shm_linear_allocator.cpp
+add_library(shared_memory STATIC
+  src/shared_memory.cpp
   src/fd_helpers.cpp
+  src/semaphore.cpp
 )
 
 add_compile_options(
@@ -29,11 +30,10 @@ add_link_options(
   -Werror
 )
 
-target_link_libraries(linear_shm_allocator PUBLIC -lrt)
-target_include_directories(linear_shm_allocator PUBLIC include/)
+target_link_libraries(shared_memory PUBLIC -lrt -pthread)
+target_include_directories(shared_memory PUBLIC include/)
 
-add_executable(test_lsa src/test_shm_linear_allocator.cpp)
-target_link_libraries(test_lsa PUBLIC linear_shm_allocator)
-
+add_executable(test_fork_shared_memory src/test_fork_shared_memory.cpp)
+target_link_libraries(test_fork_shared_memory PUBLIC shared_memory)
 # target_link_libraries(test PUBLIC -lrt -pthread)
 # target_link_libraries(test PUBLIC Boost::system Boost::filesystem)
