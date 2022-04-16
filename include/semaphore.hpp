@@ -2,6 +2,8 @@
 #define SEMAPHORE_HPP
 
 #include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <semaphore.h>
 #include <string.h>
@@ -23,11 +25,14 @@ class Semaphore {
 
   int GetValue();
 
+  bool IsCreator();
+
  private:
   sem_t* sem_ = nullptr;
-  bool is_owner_ = false;
 
   const std::string name_;
+
+  pid_t creator_pid_ = -1;
 
 };
 

@@ -30,6 +30,8 @@ class SharedMemory {
 
   void* Map(const int fd, const size_t bytes_cnt);
 
+  bool IsCreator();
+
  private:
   struct SharedFields {
     size_t size_;
@@ -40,9 +42,9 @@ class SharedMemory {
   SharedFields* shared_fields_ = nullptr;
 
   std::string memory_name_;
-  std::string semaphore_name_;
 
-  Semaphore semaphore_;
+  pid_t creator_pid_ = -1;
+
 };
 
 #endif /* shared_memory.hpp */

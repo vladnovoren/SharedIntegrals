@@ -1,24 +1,18 @@
 #include "shared_memory.hpp"
 
 SharedMemory::SharedMemory(const char *name)
-    : memory_name_(name), semaphore_name_("/sem_" + memory_name_),
-      semaphore_(semaphore_name_.c_str()) {
+    : memory_name_(name) {
   assert(name != nullptr);
-
-  semaphore_.Wait();
 
   int fd = ShmOpenCreated(name);
   buffer_ = Map(fd, FileSize(fd));
   CloseFD(fd);
 
   SetPointerFields();
-
-  semaphore_.Post();
 }
 
 SharedMemory::SharedMemory(const char *name, const size_t size)
-    : memory_name_(name), semaphore_name_("/sem_" + memory_name_),
-      semaphore_(semaphore_name_.c_str(), 1) {
+    : memory_name_(name), creator_pid_(getpid()) {
   assert(name != nullptr);
 
   int fd = ShmCreate(name, size + sizeof(SharedFields));
@@ -28,11 +22,13 @@ SharedMemory::SharedMemory(const char *name, const size_t size)
 
   SetPointerFields();
   shared_fields_->size_ = size;
-
-  semaphore_.Post();
 }
 
-SharedMemory::~SharedMemory() { shm_unlink(memory_name_.c_str()); }
+SharedMemory::~SharedMemory() {
+  if (IsCreator()) {
+    shm_unlink(memory_name_.c_str());
+  }
+}
 
 void *SharedMemory::Data(const size_t offset) {
   return static_cast<uint8_t *>(data_) + offset;
@@ -86,4 +82,8 @@ void *SharedMemory::Map(const int fd, const size_t bytes_cnt) {
     throw std::runtime_error(error_msg);
   }
   return addr;
+}
+
+bool SharedMemory::IsCreator() {
+  return getpid() == creator_pid_;
 }

@@ -1,7 +1,7 @@
 #include "semaphore.hpp"
 
 Semaphore::Semaphore(const char *name, const unsigned int value)
-    : is_owner_{true}, name_(name) {
+    : name_(name), creator_pid_(getpid()) {
   assert(name != nullptr);
 
   sem_ = sem_open(name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 0);
@@ -26,12 +26,12 @@ Semaphore::Semaphore(const char *name) : name_(name) {
 }
 
 Semaphore::~Semaphore() {
-  if (is_owner_) {
-    printf("unlink\n");
+  
+  if (sem_close(sem_) < 0) {
+    printf("...\n");
+  }
+  if (IsCreator()) {
     sem_unlink(name_.c_str());
-  } else {
-    printf("close\n");
-    sem_close(sem_);
   }
 }
 
@@ -83,4 +83,8 @@ int Semaphore::GetValue() {
     throw std::runtime_error(error_msg);
   }
   return value;
+}
+
+bool Semaphore::IsCreator() {
+  return getpid() == creator_pid_;
 }
