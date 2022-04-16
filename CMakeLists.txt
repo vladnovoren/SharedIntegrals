@@ -7,9 +7,10 @@ project(SharedIntegrals)
 # add_executable(test src/test.cpp)
 
 add_library(shared_memory STATIC
-  src/shared_memory.cpp
+  src/shared_memory_object.cpp
   src/fd_helpers.cpp
   src/semaphore.cpp
+  src/shared_memory_linear_allocator.cpp
 )
 
 add_compile_options(

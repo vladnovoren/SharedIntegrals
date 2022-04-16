@@ -1,5 +1,5 @@
-#ifndef SHARED_MEMORY_HPP
-#define SHARED_MEMORY_HPP
+#ifndef SHARED_MEMORY_OBJECT_HPP
+#define SHARED_MEMORY_OBJECT_HPP
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -11,22 +11,22 @@
 #include "fd_helpers.hpp"
 #include "semaphore.hpp"
 
-class SharedMemory {
+class SharedMemoryObject {
  public:
-  SharedMemory(const char* name);
-  SharedMemory(const char* name, const size_t size);
-  ~SharedMemory();
+  SharedMemoryObject(const std::string& name);
+  SharedMemoryObject(const std::string& name, const size_t size);
+  ~SharedMemoryObject();
 
   const std::string& Name();
 
   void* Data(const size_t offset = 0);
-  size_t Size() const;
+  size_t Size();
 
  private:
   void SetPointerFields();
 
-  int ShmCreate(const char* name, const size_t bytes_cnt);
-  int ShmOpenCreated(const char* name);
+  int ShmCreate(const std::string& name, const size_t bytes_cnt);
+  int ShmOpenCreated(const std::string& name);
 
   void* Map(const int fd, const size_t bytes_cnt);
 
@@ -47,4 +47,4 @@ class SharedMemory {
 
 };
 
-#endif /* shared_memory.hpp */
+#endif /* shared_memory_object.hpp */

@@ -1,21 +1,36 @@
-#ifndef SHARED_MEMORY_LINEAR_ALLOCATOR_HPP
-#define SHARED_MEMORY_LINEAR_ALLOCATOR_HPP
+#ifndef SHARED_LINEAR_ALLOCATOR_HPP
+#define SHARED_LINEAR_ALLOCATOR_HPP
 
-#include "shared_memory.hpp"
+#include "shared_memory_object.hpp"
 
 class SharedMemoryLinearAllocator {
  public:
-  SharedMemoryLinearAllocator(const char* name);
-  SharedMemoryLinearAllocator(const char* name, const size_t cap);
+  SharedMemoryLinearAllocator(const std::string& name, void* buffer, const size_t cap);
+  SharedMemoryLinearAllocator(const std::string& name);
   ~SharedMemoryLinearAllocator();
 
-  void* Reserve(const size_t size);
-  size_t Capacity();
-  size_t Used();
-  size_t Remained();
+  size_t Cap();
+
+  void* TryAllocate(const size_t size);
 
  private:
-  SharedMemory shared_memory_;
+  void* FreeData();
+
+  size_t Used();
+  size_t Free();
+
+  bool CanAllocate(const size_t size);
+
+ private:
+  SharedMemoryObject shared_memory_;
+  Semaphore locker_;
+
+  struct SharedFields {
+    size_t cap_;
+    size_t used_;
+  };
+
+  SharedFields* shared_fields_ = nullptr;
 
 };
 

@@ -1,17 +1,17 @@
-#include "shared_memory.hpp"
+#include "shared_memory_linear_allocator.hpp"
 
 void ChildRoutine() {
-  SharedMemory shared_memory("shared_memory");
+  SharedMemoryObject shared_memory("shared_memory");
   int* ptr = static_cast<int*>(shared_memory.Data());
   ptr[0]++;
 }
 
-void ChildRoutineReference(SharedMemory& shared_memory) {
+void ChildRoutineReference(SharedMemoryObject& shared_memory) {
   int* ptr = static_cast<int*>(shared_memory.Data());
   ptr[0]++;
 }
 
-void ParentRoutine(SharedMemory& shared_memory) {
+void ParentRoutine(SharedMemoryObject& shared_memory) {
   int* ptr = static_cast<int*>(shared_memory.Data());
   ptr[0] = 0;
 }
@@ -25,8 +25,40 @@ void MakeChildren(const size_t n) {
   }
 }
 
+void ChildRoutineAllocator(SharedMemoryLinearAllocator& allocator, size_t num) {
+  int* ptr = static_cast<int*>(allocator.TryAllocate(sizeof(int)));
+  assert(ptr != nullptr);
+  Semaphore locker("locker", 1);
+  Semaphore counter("counter", 4);
+  counter.Post();
+  if (counter.GetValue() == 1) {
+    locker.Post();
+  }
+  ptr[0] = num;
+  locker.Wait();
+  printf("ptr: %p, num: %d\n", ptr, ptr[0]);
+  locker.Post();
+}
+
+void TestSharedMemoryLinearAllocator() {
+  SharedMemoryLinearAllocator allocator("allocator", 1024);
+  pid_t parend_id = getpid();
+
+  Semaphore children_counter("children_counter", 4);
+
+  MakeChildren(4);
+
+  if (parend_id != getpid()) {
+    ChildRoutineAllocator(allocator, children_counter.GetValue());
+    children_counter.Post();
+  } else {
+    while (children_counter.GetValue() != 4) {
+    }
+  }
+}
+
 void ChildrenAfterParentTest() {
-  SharedMemory shared_memory("shared_memory", 1024);
+  SharedMemoryObject shared_memory("shared_memory", 1024);
 
   printf("parend_id: %d\n", getpid());
 
@@ -64,6 +96,7 @@ void ChildrenAfterParentTest() {
 }
 
 int main() {
-  ChildrenAfterParentTest();
+  // ChildrenAfterParentTest();
+  TestSharedMemoryLinearAllocator();
   return 0;
 }

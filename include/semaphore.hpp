@@ -14,8 +14,8 @@
 
 class Semaphore {
  public:
-  Semaphore(const char* name, const unsigned int value);
-  explicit Semaphore(const char* name);
+  Semaphore(const std::string& name, const unsigned int value);
+  explicit Semaphore(const std::string& name);
   ~Semaphore();
 
   void Wait();

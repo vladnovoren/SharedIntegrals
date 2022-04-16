@@ -1,10 +1,8 @@
 #include "semaphore.hpp"
 
-Semaphore::Semaphore(const char *name, const unsigned int value)
+Semaphore::Semaphore(const std::string& name, const unsigned int value)
     : name_(name), creator_pid_(getpid()) {
-  assert(name != nullptr);
-
-  sem_ = sem_open(name, O_CREAT | O_EXCL, S_IRUSR | S_IWUSR, 0);
+  sem_ = sem_open(name.c_str(), O_CREAT, S_IRUSR | S_IWUSR, 0);
   if (sem_ == SEM_FAILED) {
     std::string error_msg = __PRETTY_FUNCTION__;
     error_msg += '\n';
@@ -13,10 +11,8 @@ Semaphore::Semaphore(const char *name, const unsigned int value)
   }
 }
 
-Semaphore::Semaphore(const char *name) : name_(name) {
-  assert(name != nullptr);
-
-  sem_ = sem_open(name, 0);
+Semaphore::Semaphore(const std::string& name) : name_(name) {
+  sem_ = sem_open(name.c_str(), 0);
   if (sem_ == SEM_FAILED) {
     std::string error_msg = __PRETTY_FUNCTION__;
     error_msg += '\n';
@@ -26,10 +22,7 @@ Semaphore::Semaphore(const char *name) : name_(name) {
 }
 
 Semaphore::~Semaphore() {
-  
-  if (sem_close(sem_) < 0) {
-    printf("...\n");
-  }
+  sem_close(sem_);
   if (IsCreator()) {
     sem_unlink(name_.c_str());
   }

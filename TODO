@@ -1,3 +1,11 @@
-cycle with fork() and pid check to create child processes
-save creator process id in semaphore
+ManagedSharedMemory with search by object name and methods
 
+template<typename ObjT, typename... ArgsT>
+ObjT* Construct(ArgsT&&... args) {
+  /*...*/
+}
+
+template<typename ObjT>
+ObjT* Find(const std::string& name) {
+  /*...*/
+}
