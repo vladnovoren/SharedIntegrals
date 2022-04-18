@@ -2,6 +2,8 @@
 #define MANAGED_SHARED_MEMORY_HPP
 
 #include "shared_memory_object.hpp"
+#include "unsafe_shared_object.hpp"
+#include "linear_allocator.hpp"
 
 class ManagedSharedMemory {
  public:
@@ -21,7 +23,8 @@ class ManagedSharedMemory {
  private:
   SharedMemoryObject buffer_;
   SharedMemoryObject names_addresses_;
-  SharedMemoryObject allocator_;
+
+  UnsafeSharedObject<LinearAllocator> allocator_;
 
 };
 
