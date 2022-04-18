@@ -6,6 +6,9 @@
 template <typename ObjT>
 class UnsafeSharedObject {
 public:
+  UnsafeSharedObject(const std::string& name) : shared_memory_(name) {
+  }
+
   template <typename... ArgsT>
   UnsafeSharedObject(const std::string &name, ArgsT &&... args)
       : shared_memory_(name, sizeof(ObjT)) {
