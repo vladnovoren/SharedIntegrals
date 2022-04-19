@@ -16,12 +16,13 @@ class LinearAllocator {
   bool CanAllocate(const size_t size);
 
   void* Allocate(const size_t size);
+  void Deallocate(const size_t size);
+
+  void* Data(const size_t offset);
 
  private:
   static const char* const UNABLE_TO_ALLOCATE_MSG_;
-
- private:
-  void* Data(const size_t offset);
+  static const char* const UNABLE_TO_DEALLOCATE_MSG_;
 
  private:
   void* buffer_ = nullptr;
