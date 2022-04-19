@@ -16,7 +16,9 @@ public:
     new (obj_ptr) ObjT(std::forward<ArgsT>(args)...);
   }
 
-  ~UnsafeSharedObject() {}
+  ~UnsafeSharedObject() {
+    GetObjPtr()->~ObjT();
+  }
 
   ObjT* GetObjPtr() {
     return static_cast<ObjT*>(shared_memory_.Data());

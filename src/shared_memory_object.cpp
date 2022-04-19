@@ -77,5 +77,6 @@ void *SharedMemoryObject::Map(const int fd, const size_t bytes_cnt) {
 }
 
 bool SharedMemoryObject::IsCreator() {
+  
   return getpid() == creator_pid_;
 }

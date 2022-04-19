@@ -2,6 +2,7 @@
 #include "unsafe_stack.hpp"
 #include <iostream>
 #include "blocking_queue.hpp"
+#include <sys/wait.h>
 
 struct Point {
   Point() {}
@@ -20,39 +21,43 @@ void MakeChildren(const size_t n) {
   }
 }
 
+void WaitChildren() {
+  while (wait(NULL) > 0) {}
+}
+
 void TestQueueChildRoutine() {
   ManagedSharedMemory managed_shared_memory(find_only, "for_queue");
   BlockingQueue<int>* queue_ptr = managed_shared_memory.Find<BlockingQueue<int>>("queue");
-  Destructor<BlockingQueue<int>> destr(queue_ptr);
-
-  while (true) {
-    
+  for (size_t i = 0; i < 4; ++i) {
+    std::cout << queue_ptr->Take() << '\n';
   }
 }
 
 void TestQueue() {
-  ManagedSharedMemory managed_shared_memory(create_only, "for_queue", 1024);
-  BlockingQueue<int>* queue_ptr = managed_shared_memory.Construct<BlockingQueue<int>>("queue", 10);
-  Destructor<BlockingQueue<int>> destr(queue_ptr);
-
-  Semaphore sem(create_only, "/counter", 0);
-  
   pid_t parent_id = getpid();
+
+  ManagedSharedMemory managed_shared_memory(create_only, "for_queue", 1024);
+  BlockingQueue<int>* queue_ptr = managed_shared_memory.Construct<BlockingQueue<int>>("queue", 4);
+  Destructor<BlockingQueue<int>> destr(queue_ptr, parent_id);
 
   MakeChildren(1);
 
   if (parent_id != getpid()) {
     TestQueueChildRoutine();
-    sem.Post();
   } else {
+    int x = 0;
+    for (size_t i = 0; i < 4; ++i) {
+      std::cin >> x;
+      queue_ptr->Put(x);
+    }
+  }
 
-    sem.Wait();
+  if (parent_id == getpid()) {
+    WaitChildren();
   }
 }
 
 int main() {
-  // TestChildProcessFind();
-  // TestStack();
   TestQueue();
   return 0;
 }

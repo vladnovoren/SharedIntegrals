@@ -57,7 +57,6 @@ class ManagedSharedMemory {
   SharedMemoryObject buffer_;
 
   UnsafeSharedObject<ReadAddAddressesMap> addresses_map_;
-
   UnsafeSharedObject<LinearAllocator> allocator_;
 
  private:

@@ -10,13 +10,15 @@ template<typename ElemT>
 class BlockingQueue {
  public:
   BlockingQueue(find_only_t, const std::string& name)
-      : locker_(find_only, "/queue_locker_" + name) {
+      : free_(find_only, "/free_counter_" + name),
+        used_(find_only, "/used_counter_" + name),
+        locker_(find_only, "/queue_locker_" + name) {
   }
 
   BlockingQueue(create_only_t, const std::string& name, const size_t cap)
       : cap_(cap),
-        free_(cap),
-        used_(0),
+        free_(create_only, "/free_counter_" + name, cap),
+        used_(create_only, "/used_counter_" + name, 0),
         locker_(create_only, "/queue_locker_" + name, 1) {
     SemLockGuard lock(locker_);
 
@@ -26,19 +28,18 @@ class BlockingQueue {
     new (pop_stack_) UnsafeStack<ElemT>(cap);
   }
 
-  ~BlockingQueue() {}
+  ~BlockingQueue() {
+    push_stack_->~UnsafeStack();
+    pop_stack_->~UnsafeStack();
+  }
 
   template<typename... ArgsT>
   void Put(ArgsT&&... args) {
     free_.Wait();
-  
+
     SemLockGuard lock(locker_);
 
-    if (size_ == cap_) {
-      throw std::logic_error(UNABLE_TO_PUSH_);
-    }
     push_stack_->TryPush(std::forward<ArgsT>(args)...);
-    ++size_;
 
     used_.Post();
   }
@@ -48,15 +49,17 @@ class BlockingQueue {
 
     SemLockGuard lock(locker_);
 
-    ValidStacks();
-    
+    ValidBeforePop();
+    ElemT front(std::move(pop_stack_->Top()));
     pop_stack_->Pop();
 
     free_.Post();
+
+    return front;
   }
 
  private:
-  void ValidStacks() {
+  void ValidBeforePop() {
     if (pop_stack_->IsEmpty()) {
       while (!push_stack_->IsEmpty()) {
         pop_stack_->TryPush(std::move(push_stack_->Top()));

@@ -9,16 +9,24 @@ static const find_only_t find_only;
 
 template<typename ObjT>
 struct Destructor {
-  Destructor(ObjT* obj) : obj_(obj) {
+  Destructor(ObjT* obj, pid_t creator_id) : obj_(obj), creator_id_(creator_id) {
     assert(obj != nullptr);
   }
 
   ~Destructor() {
-    obj_->~ObjT();
+    if (IsCreator()) {
+      obj_->~ObjT();
+    }
+  }
+
+ private:
+  bool IsCreator() {
+    return getpid() == creator_id_;
   }
 
  private:
   ObjT* obj_;
+  pid_t creator_id_ = -1;
 
 };
 
