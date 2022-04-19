@@ -17,7 +17,7 @@ add_library(shared_memory STATIC
 )
 
 add_compile_options(
-  -fsanitize=address
+  # -fsanitize=address
   -g
 
   -Wall
@@ -27,7 +27,7 @@ add_compile_options(
 )
 
 add_link_options(
-  -fsanitize=address
+  # -fsanitize=address
   -g
 
   -Wall

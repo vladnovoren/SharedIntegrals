@@ -18,7 +18,7 @@ class LinearAllocator {
   void* Allocate(const size_t size);
   void Deallocate(const size_t size);
 
-  void* Data(const size_t offset);
+  void* Data(const size_t offset = 0);
 
  private:
   static const char* const UNABLE_TO_ALLOCATE_MSG_;

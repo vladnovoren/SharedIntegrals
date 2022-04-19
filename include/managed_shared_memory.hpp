@@ -44,7 +44,7 @@ class ManagedSharedMemory {
     if (ptr == nullptr) {
       return nullptr;
     }
-    new (ptr) ObjT(std::forward<ArgsT>(args)...);
+    new (ptr) ObjT(create_only, name, std::forward<ArgsT>(args)...);
 
     if (!addresses_map_.GetObjPtr()->TryAdd(name, ptr)) {
       return nullptr;
