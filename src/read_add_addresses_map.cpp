@@ -16,10 +16,13 @@ bool ReadAddAddressesMap::TryAdd(const std::string& name, void* address) {
     return false;
   }
   names_[size_].obj_ptr = address;
+  ++size_;
+
+  return true;
 }
 
 void* ReadAddAddressesMap::Find(const std::string& name) {
-  if (CheckNameSize(name)) {
+  if (!CheckNameSize(name)) {
     return nullptr;
   }
 

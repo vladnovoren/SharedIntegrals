@@ -13,8 +13,8 @@
 
 class SharedMemoryObject {
  public:
-  SharedMemoryObject(const std::string& name);
-  SharedMemoryObject(const std::string& name, const size_t size);
+  SharedMemoryObject(find_only_t, const std::string& name);
+  SharedMemoryObject(create_only_t, const std::string& name, const size_t size);
   ~SharedMemoryObject();
 
   const std::string& Name();

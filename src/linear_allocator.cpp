@@ -1,6 +1,6 @@
 #include "linear_allocator.hpp"
 
-static const char* const UNABLE_TO_ALLOCATE_MSG_ = "unable to allocate memory";
+const char* const LinearAllocator::UNABLE_TO_ALLOCATE_MSG_ = "unable to allocate memory";
 
 LinearAllocator::LinearAllocator(void* buffer, const size_t cap)
     : buffer_(buffer), cap_(cap) {}

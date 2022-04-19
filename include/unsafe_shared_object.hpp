@@ -6,14 +6,14 @@
 template <typename ObjT>
 class UnsafeSharedObject {
 public:
-  UnsafeSharedObject(const std::string& name) : shared_memory_(name) {
+  UnsafeSharedObject(find_only_t, const std::string& name) : shared_memory_(find_only, name) {
   }
 
   template <typename... ArgsT>
-  UnsafeSharedObject(const std::string &name, ArgsT &&... args)
-      : shared_memory_(name, sizeof(ObjT)) {
+  UnsafeSharedObject(create_only_t, const std::string &name, ArgsT &&... args)
+      : shared_memory_(create_only, name, sizeof(ObjT)) {
     ObjT* obj_ptr = static_cast<ObjT*>(shared_memory_.Data());
-    new (obj_ptr) ObjT(std::forward<ArgsT>(args)..);
+    new (obj_ptr) ObjT(std::forward<ArgsT>(args)...);
   }
 
   ~UnsafeSharedObject() {}

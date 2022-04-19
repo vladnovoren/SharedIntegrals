@@ -1,6 +1,6 @@
 #include "shared_memory_object.hpp"
 
-SharedMemoryObject::SharedMemoryObject(const std::string& name)
+SharedMemoryObject::SharedMemoryObject(find_only_t, const std::string& name)
     : memory_name_(name) {
   int fd = ShmOpenCreated(name);
   buffer_ = Map(fd, FileSize(fd));
@@ -9,7 +9,7 @@ SharedMemoryObject::SharedMemoryObject(const std::string& name)
   SetPointerFields();
 }
 
-SharedMemoryObject::SharedMemoryObject(const std::string& name, const size_t size)
+SharedMemoryObject::SharedMemoryObject(create_only_t, const std::string& name, const size_t size)
     : memory_name_(name), creator_pid_(getpid()) {
   int fd = ShmCreate(name, size + sizeof(SharedFields));
   Truncate(fd, size + sizeof(SharedFields));

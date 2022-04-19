@@ -1,8 +1,8 @@
 #include "semaphore.hpp"
 
-Semaphore::Semaphore(const std::string& name, const unsigned int value)
+Semaphore::Semaphore(create_only_t, const std::string& name, const unsigned int value)
     : name_(name), creator_pid_(getpid()) {
-  sem_ = sem_open(name.c_str(), O_CREAT, S_IRUSR | S_IWUSR, 0);
+  sem_ = sem_open(name.c_str(), O_CREAT, S_IRUSR | S_IWUSR, value);
   if (sem_ == SEM_FAILED) {
     std::string error_msg = __PRETTY_FUNCTION__;
     error_msg += '\n';
@@ -11,7 +11,7 @@ Semaphore::Semaphore(const std::string& name, const unsigned int value)
   }
 }
 
-Semaphore::Semaphore(const std::string& name) : name_(name) {
+Semaphore::Semaphore(find_only_t, const std::string& name) : name_(name) {
   sem_ = sem_open(name.c_str(), 0);
   if (sem_ == SEM_FAILED) {
     std::string error_msg = __PRETTY_FUNCTION__;

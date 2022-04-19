@@ -11,11 +11,12 @@
 #include <cassert>
 #include <stdexcept>
 #include <string>
+#include "help_types.hpp"
 
 class Semaphore {
  public:
-  Semaphore(const std::string& name, const unsigned int value);
-  explicit Semaphore(const std::string& name);
+  Semaphore(create_only_t, const std::string& name, const unsigned int value);
+  explicit Semaphore(find_only_t, const std::string& name);
   ~Semaphore();
 
   void Wait();
