@@ -16,5 +16,9 @@ double X(double x) {
 }
 
 double F(double x) {
+  // return xsin2x(x);
+  // return x;
+  // return cos(x);
+  // return sin(x);
   return rep(x); // here you can call your own function
 }
