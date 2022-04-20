@@ -27,7 +27,7 @@ void WaitChildren() {
 
 void TestQueueChildRoutine() {
   ManagedSharedMemory managed_shared_memory(find_only, "for_queue");
-  BlockingQueue<int>* queue_ptr = managed_shared_memory.Find<BlockingQueue<int>>("queue");
+  BlockingQueue<int, 4>* queue_ptr = managed_shared_memory.Find<BlockingQueue<int, 4>>("queue");
   for (size_t i = 0; i < 4; ++i) {
     std::cout << queue_ptr->Take() << '\n';
   }
@@ -37,10 +37,10 @@ void TestQueue() {
   pid_t parent_id = getpid();
 
   ManagedSharedMemory managed_shared_memory(create_only, "for_queue", 1024);
-  BlockingQueue<int>* queue_ptr = managed_shared_memory.Construct<BlockingQueue<int>>("queue", 4);
-  Destructor<BlockingQueue<int>> destr(queue_ptr, parent_id);
+  BlockingQueue<int, 4>* queue_ptr = managed_shared_memory.Construct<BlockingQueue<int, 4>>("queue");
+  Destructor<BlockingQueue<int, 4>> destr(queue_ptr, parent_id);
 
-  MakeChildren(1);
+  // MakeChildren(1);
 
   if (parent_id != getpid()) {
     TestQueueChildRoutine();

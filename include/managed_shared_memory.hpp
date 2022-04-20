@@ -14,14 +14,14 @@ class ManagedSharedMemory {
 
   template<typename ObjT>
   ObjT* Find(const std::string& name) {
-    SemLockGuard lock(sem_);
+    SemLockGuard lock(locker_);
 
     return FindUnsafeImpl<ObjT>(name);
   }
 
   template<typename ObjT, typename... ArgsT>
   ObjT* Construct(const std::string& name, ArgsT&&... args) {
-    SemLockGuard lock(sem_);
+    SemLockGuard lock(locker_);
 
     return ConstructUnsafeImpl<ObjT>(name, std::forward<ArgsT>(args)...);
   }
@@ -60,7 +60,7 @@ class ManagedSharedMemory {
   UnsafeSharedObject<LinearAllocator> allocator_;
 
  private:
-  Semaphore sem_;
+  Semaphore locker_;
 
 };
 
