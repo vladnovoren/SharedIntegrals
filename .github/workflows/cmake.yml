@@ -35,4 +35,9 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ./int_test
-
+artifacts:
+  when: always
+  paths:
+    - rspec.xml
+  reports:
+    junit: rspec.xml
