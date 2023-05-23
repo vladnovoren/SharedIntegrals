@@ -7,6 +7,8 @@ struct find_only_t {};
 static const create_only_t create_only;
 static const find_only_t find_only;
 
+static constexpr double eps = 1e-2;
+
 template<typename ObjT>
 struct Destructor {
   Destructor(ObjT* obj, pid_t creator_id) : obj_(obj), creator_id_(creator_id) {

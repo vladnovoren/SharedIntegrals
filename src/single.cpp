@@ -1,19 +1,24 @@
 #include "integral_solver.hpp"
 
-void SingleSolution() {
+double SingleSolution(std::function<double(double)> f) {
   double result = 0;
 
   double lhs_lim = 0;
   double rhs_lim = M_PI;
 
-  IntegralTask task{F, lhs_lim, rhs_lim, FRAC};
+  IntegralTask task{f, lhs_lim, rhs_lim, FRAC};
   result = task.Complete();
 
-  std::cout << result << '\n';
+  return result;
 }
 
 int main() {
-  SingleSolution();
+  std::cout << SingleSolution(xsin2x) << '\n';
+  std::cout << SingleSolution(exsinex) << '\n';
+  std::cout << SingleSolution(expx2) << '\n';
+  std::cout << SingleSolution(x2sinx2) << '\n';
+  std::cout << SingleSolution(x2ln1_plus_x) << '\n';
+  std::cout << SingleSolution(x3) << '\n';
   return 0;
 }
 

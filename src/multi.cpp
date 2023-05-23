@@ -6,6 +6,24 @@ static const size_t TASKS_CNT = 16;
 static const size_t TASK_FRAC = FRAC / TASKS_CNT;
 
 
+static const std::function<double(double)> functions[] = {
+  xsin2x,
+  exsinex,
+  expx2,
+  x2sinx2,
+  x2ln1_plus_x,
+  x3
+};
+
+static constexpr double answers[] = {
+  2.4674,
+  0.949004,
+  3267.24,
+  1.70073,
+  12.3138,
+  24.3523
+};
+
 void ChildRoutine() {
   ManagedSharedMemory managed_shared_memory(find_only, "managed_shared_memory");
 
@@ -21,7 +39,7 @@ void ChildRoutine() {
   }
 }
 
-void MultiSolution() {
+double MultiSolution(std::function<double(double)> f) {
   double result = 0;
 
   pid_t creator_id = getpid();
@@ -33,7 +51,7 @@ void MultiSolution() {
 
   BlockingQueue<double, TASKS_CNT>* results_queue = managed_shared_memory.Construct<BlockingQueue<double, TASKS_CNT>>("results_queue");
   Destructor<BlockingQueue<double, TASKS_CNT>> results_destr(results_queue, creator_id);
-  
+
   MakeChildren(CHILDREN_CNT);
 
   if (getpid() != creator_id) {
@@ -44,7 +62,7 @@ void MultiSolution() {
     double rhs_lim = M_PI;
 
     for (size_t i = 0; i < TASKS_CNT; ++i) {
-      task_queue->Put(IntegralTask{F, GetIndexed(lhs_lim, rhs_lim, i, TASKS_CNT), GetIndexed(lhs_lim, rhs_lim, i + 1, TASKS_CNT), TASK_FRAC});
+      task_queue->Put(IntegralTask{f, GetIndexed(lhs_lim, rhs_lim, i, TASKS_CNT), GetIndexed(lhs_lim, rhs_lim, i + 1, TASKS_CNT), TASK_FRAC});
     }
 
     for (size_t i = 0; i < TASKS_CNT; ++i) {
@@ -57,13 +75,15 @@ void MultiSolution() {
   }
 
   WaitChildren(creator_id);
-
-  if (creator_id == getpid()) {
-    std::cout << result << '\n';
-  }
+  return result;
 }
 
-int main() {
-  MultiSolution();
+int main(int, char** argv) {
+  int i = atoi(argv[1]);
+  pid_t parent_id = getpid();
+  double res = MultiSolution(functions[i]);
+  if (getpid() == parent_id) {
+    assert(fabs(res - answers[i]) < eps);
+  }
   return 0;
 }
