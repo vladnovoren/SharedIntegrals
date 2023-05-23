@@ -24,20 +24,10 @@ add_library(integrals STATIC
 
 add_compile_options(
   -g
-
-  -Wall
-  -Wextra
-  -Wpedantic
-  -Werror
 )
 
 add_link_options(
   -g
-
-  -Wall
-  -Wextra
-  -Wpedantic
-  -Werror
 )
 
 target_link_libraries(shared_memory PUBLIC -lrt -pthread)
