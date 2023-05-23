@@ -81,7 +81,8 @@ double MultiSolution(std::function<double(double)> f) {
 int main(int, char** argv) {
   int i = atoi(argv[1]);
   pid_t parent_id = getpid();
-  double res = MultiSolution(functions[i]);
+  double res = 0;
+  res = MultiSolution(functions[i]);
   if (getpid() == parent_id) {
     assert(fabs(res - answers[i]) < eps);
   }
