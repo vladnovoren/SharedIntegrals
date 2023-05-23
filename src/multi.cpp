@@ -84,7 +84,9 @@ int main(int, char** argv) {
   double res = 0;
   res = MultiSolution(functions[i]);
   if (getpid() == parent_id) {
-    assert(fabs(res - answers[i]) < eps);
+    if (fabs(res - answers[i]) > eps) {
+      exit(1);
+    }
   }
   return 0;
 }
