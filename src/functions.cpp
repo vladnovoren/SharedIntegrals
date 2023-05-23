@@ -4,21 +4,23 @@ double xsin2x(double x) {
   return x * sin(x) * sin(x);
 }
 
-double rep(double x) {
-  for (size_t i = 0; i < 1000000; ++i) { // some heavy computing
-    x *= sin(x) * (1 - sin(x));
-  }
-  return x;
+double exsinex(double x) {
+  return exp(x) * sin(exp(x));
 }
 
-double X(double x) {
-  return x;
+double expx2(double x) {
+  return std::exp(x * x);
 }
 
-double F(double x) {
-  // return xsin2x(x);
-  // return x;
-  // return cos(x);
-  // return sin(x);
-  return rep(x); // here you can call your own function
+double x2sinx2(double x) {
+  return x * x * std::sin(x * x);
 }
+
+double x2ln1_plus_x(double x) {
+  return x * x * std::log(1 + x);
+}
+
+double x3(double x) {
+  return x * x * x;
+}
+

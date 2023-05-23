@@ -54,3 +54,5 @@ target_link_libraries(multi PUBLIC integrals)
 
 add_executable(single src/single.cpp)
 target_link_libraries(single PUBLIC integrals)
+
+add_executable(test src/test.cpp)
