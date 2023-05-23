@@ -6,6 +6,8 @@ set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(GTest)
+
 add_library(shared_memory STATIC
   src/linear_allocator.cpp
   src/fd_helpers.cpp
@@ -45,4 +47,17 @@ target_link_libraries(multi PUBLIC integrals)
 add_executable(single src/single.cpp)
 target_link_libraries(single PUBLIC integrals)
 
-add_executable(test src/test.cpp)
+enable_testing()
+
+add_executable(
+  int_test
+  src/test.cpp
+)
+
+target_link_libraries(
+  int_test
+  GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(int_test)

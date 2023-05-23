@@ -1,4 +1,5 @@
 #include "integral_solver.hpp"
+#include <fstream>
 
 static const size_t CHILDREN_CNT = 4;
 
@@ -13,15 +14,6 @@ static const std::function<double(double)> functions[] = {
   x2sinx2,
   x2ln1_plus_x,
   x3
-};
-
-static constexpr double answers[] = {
-  2.4674,
-  0.949004,
-  3267.24,
-  1.70073,
-  12.3138,
-  24.3523
 };
 
 void ChildRoutine() {
@@ -79,14 +71,15 @@ double MultiSolution(std::function<double(double)> f) {
 }
 
 int main(int, char** argv) {
+  std::ofstream out;
+  out.open("out.txt", std::ios_base::app);
   int i = atoi(argv[1]);
   pid_t parent_id = getpid();
   double res = 0;
   res = MultiSolution(functions[i]);
   if (getpid() == parent_id) {
-    if (fabs(res - answers[i]) > eps) {
-      exit(1);
-    }
+    out << std::to_string(res) << '\n';
+    out.close();
   }
   return 0;
 }
